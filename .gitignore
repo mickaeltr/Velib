@@ -1,0 +1,7 @@
+# Intellij IDEA
+.idea/
+*.iml
+*.iws
+
+# MacOS
+.DS_Store
