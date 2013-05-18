@@ -1,6 +1,6 @@
 $(document).ready(function () {
 
-    var station = {}, templates = {};
+    var station, templates;
     initialize();
     updateStation();
 
@@ -36,7 +36,7 @@ $(document).ready(function () {
     }
 
     function updateStation() {
-        station.number = window.location.hash.slice(1);
+        station = {number: window.location.hash.slice(1)};
         if (station.number) {
             $.getJSON("https://api.jcdecaux.com/vls/v1/stations/" + station.number + "?callback=?&" + $.param({
                 contract: "Paris",
@@ -51,22 +51,25 @@ $(document).ready(function () {
     }
 
     function onStationUpdate() {
-        station.last_update_from_now = moment(station.last_update).fromNow();
-        station.availability = getAvailability();
-        $("#velib").html(templates.success(station));
-        document.title = templates.titleSuccess(station);
+        if (station) {
+            station.last_update_from_now = moment(station.last_update).fromNow();
+            station.availability = getAvailability();
+            $("#velib").html(templates.success(station));
+            document.title = templates.titleSuccess(station);
+        }
     }
 
     function onError() {
+        station = null;
         $("#velib").html(templates.error());
         document.title = templates.titleError();
     }
 
     function getAvailability() {
-        if(station.available_bikes > 5) {
+        if (station.available_bikes > 5) {
             return "success";
         }
-        if(station.available_bikes > 1) {
+        if (station.available_bikes > 1) {
             return "warning";
         }
         return "error";
