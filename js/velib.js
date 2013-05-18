@@ -1,7 +1,6 @@
 $(document).ready(function () {
 
     var station = {}, templates = {};
-
     initialize();
     updateStation();
 
@@ -34,7 +33,6 @@ $(document).ready(function () {
 
         // Update station view regularly (we want to know how much time from now was the last update)
         window.setInterval(onStationUpdate, moment.duration({seconds: 15}).asMilliseconds());
-
     }
 
     function updateStation() {
@@ -54,17 +52,17 @@ $(document).ready(function () {
 
     function onStationUpdate() {
         station.last_update_from_now = moment(station.last_update).fromNow();
-        station.availability_level = getAvailabilityLevel();
+        station.availability = getAvailability();
         $("#velib").html(templates.success(station));
         document.title = templates.titleSuccess(station);
     }
 
     function onError() {
         $("#velib").html(templates.error());
-        document.title = templates.titleError(station);
+        document.title = templates.titleError();
     }
 
-    function getAvailabilityLevel() {
+    function getAvailability() {
         if(station.available_bikes > 5) {
             return "success";
         }
