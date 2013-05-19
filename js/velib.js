@@ -1,11 +1,14 @@
 $(document).ready(function () {
 
-    var api, station, templates;
+    var api, station, templates, $view;
+
     initializeApplication();
     initializeStation();
 
+    /** Initialize application settings + events + listeners */
     function initializeApplication() {
 
+        // Set up API
         api = {
             url: "https://api.jcdecaux.com/vls/v1/stations",
             params: "?callback=?&" + $.param({
@@ -24,9 +27,13 @@ $(document).ready(function () {
             }
         });
 
+        // Cache view DOM element
+        $view = $("#velib");
+
+        // Redirect AJAX errors
         $.ajaxSettings.error = onError;
 
-        // Read all templates from <script type="text/template" class="***">
+        // Read all templates from <script type="text/template" class="">
         templates = {};
         _.each($("script[type='text/template']"), function (template) {
             var $template = $(template);
@@ -34,22 +41,23 @@ $(document).ready(function () {
         });
 
         // Reinitialize station when URL hash changes
-        $(window).on("hashchange", function() {
-            if(!station || !window.location.hash || station.number != window.location.hash.slice(1)) {
+        $(window).on("hashchange", function () {
+            if (!station || !window.location.hash || station.number != window.location.hash.slice(1)) {
                 initializeStation();
             }
         });
 
-        // Update station model regularly (we want to know its current status)
+        // Update station from the API regularly (so we know its most recent status)
         window.setInterval(updateStation, moment.duration({minutes: 2}).asMilliseconds());
 
-        // Update station view regularly (we want to know how much time from now was the last update)
+        // Update view regularly (so we know how much time from now was the last update)
         window.setInterval(onStationUpdate, moment.duration({seconds: 30}).asMilliseconds());
     }
 
+    /** Initialize station from URL hash or geo location */
     function initializeStation() {
         if (window.location.hash) {
-            station = {number: window.location.hash.slice(1)};
+            setStation({number: window.location.hash.slice(1)});
             updateStation();
         } else if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(function (position) {
@@ -62,8 +70,7 @@ $(document).ready(function () {
                         );
                     });
                     // Find the nearest station
-                    station = _.find(stations, {distance: Math.min.apply(null, _.pluck(stations, "distance"))});
-                    window.location.hash = station.number;
+                    setStation(_.find(stations, {distance: Math.min.apply(null, _.pluck(stations, "distance"))}));
                     onStationUpdate();
                 });
             }, onError);
@@ -72,30 +79,45 @@ $(document).ready(function () {
         }
     }
 
+    /** Set station attributes */
+    function setStation(data) {
+        station = data;
+        if(station.number) {
+            // Update the URL according to the station
+            window.location.hash = station.number;
+            if(station.name) {
+                // Strip the station number from the station name to make it nicer
+                station.name = station.name.replace(station.number + " - ", "");
+            }
+        }
+    }
+
+    /** Update station from API */
     function updateStation() {
         if (station) {
             $.getJSON(api.url + "/" + station.number + api.params, function (data) {
-                station = data;
+                setStation(data);
                 onStationUpdate();
             });
         }
     }
 
+    /** Update view + title when the station is updated */
     function onStationUpdate() {
         if (station && station.status === "OPEN") {
-            station.name = station.name.replace(station.number + " - ", "");
             station.last_update_from_now = moment(station.last_update).fromNow();
             station.availability = station.available_bikes > 5 ? "success" : station.available_bikes > 1 ? "warning" : "error";
-            $("#velib").html(templates.success(station));
+            $view.html(templates.success(station));
             document.title = templates.titleSuccess(station);
         } else {
             onError();
         }
     }
 
+    /** Display specific view + title on error */
     function onError() {
         station = null;
-        $("#velib").html(templates.error());
+        $view.html(templates.error());
         document.title = templates.titleError();
     }
 });
