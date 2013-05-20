@@ -85,8 +85,9 @@ $(document).ready(function () {
         if (station.number) {
             // Update the URL according to the station
             window.location.hash = station.number;
+            // Make the station name nicer
             if (station.name) {
-                // Strip the station number from the station name to make it nicer
+                // Strip the station number from the station name
                 station.name = station.name.replace(station.number + " - ", "");
                 // Capitalize (only) the first letter of each word
                 station.name = station.name.replace(/\w\S*/g, function (word) {
