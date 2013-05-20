@@ -82,12 +82,16 @@ $(document).ready(function () {
     /** Set station attributes */
     function setStation(data) {
         station = data;
-        if(station.number) {
+        if (station.number) {
             // Update the URL according to the station
             window.location.hash = station.number;
-            if(station.name) {
+            if (station.name) {
                 // Strip the station number from the station name to make it nicer
                 station.name = station.name.replace(station.number + " - ", "");
+                // Capitalize (only) the first letter of each word
+                station.name = station.name.replace(/\w\S*/g, function (word) {
+                    return word.charAt(0).toUpperCase() + word.substr(1).toLowerCase();
+                });
             }
         }
     }
