@@ -88,7 +88,7 @@ $(document).ready(function () {
             // Make the station name nicer
             if (station.name) {
                 // Strip the station number from the station name
-                station.name = station.name.replace(station.number + " - ", "");
+                station.name = station.name.replace(/\d+ \- /, "");
                 // Capitalize (only) the first letter of each word
                 station.name = station.name.replace(/\w\S*/g, function (word) {
                     return word.charAt(0).toUpperCase() + word.substr(1).toLowerCase();
