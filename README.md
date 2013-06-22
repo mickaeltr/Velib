@@ -1,6 +1,8 @@
 Vélib'
 ======
 
+/!\ It does not work anymore because the Vélib open data does not support [JSON-P](http://www.json-p.org/) anymore.
+
 Try it out: http://mickaeltr.github.io/Velib/
 
 Built with:
