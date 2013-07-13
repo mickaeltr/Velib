@@ -1,6 +1,6 @@
 $(document).ready(function () {
 
-    var api, station, templates, $view;
+    var apiUrl, station, templates, $view;
 
     initializeApplication();
     initializeStation();
@@ -9,13 +9,7 @@ $(document).ready(function () {
     function initializeApplication() {
 
         // Set up API
-        api = {
-            url: "https://api.jcdecaux.com/vls/v1/stations",
-            params: "?callback=?&" + $.param({
-                contract: "Paris",
-                apiKey: "123f915ca9bfdb956117a82244e4b37203c55f07"
-            })
-        };
+        apiUrl = "./api/stations";
 
         // French localization for date displays
         moment.lang($("html").attr("lang"), {
@@ -61,7 +55,7 @@ $(document).ready(function () {
             updateStation();
         } else if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(function (position) {
-                $.getJSON(api.url + api.params, function (stations) {
+                $.getJSON(apiUrl, function (stations) {
                     // Calculate the distance for each station
                     _.each(stations, function (station) {
                         station.distance = Math.sqrt(
@@ -100,7 +94,7 @@ $(document).ready(function () {
     /** Update station from API */
     function updateStation() {
         if (station) {
-            $.getJSON(api.url + "/" + station.number + api.params, function (data) {
+            $.getJSON(apiUrl + "/" + station.number, function (data) {
                 setStation(data);
                 onStationUpdate();
             });
