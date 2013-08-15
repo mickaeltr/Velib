@@ -17,7 +17,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
-/** Heartbeat keeps the (cloud) server alive by simulating requests from the outside */
+/** Heartbeat prevents the (cloud) server hibernation by simulating requests from the outside */
 @WebFilter("/*")
 public final class Heartbeat implements Filter {
 
@@ -70,7 +70,7 @@ public final class Heartbeat implements Filter {
                     }
                 }
             }
-        }, 15, 15, TimeUnit.MINUTES);
+        }, 1, 1, TimeUnit.HOURS);
     }
 
     @Override
