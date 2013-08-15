@@ -55,12 +55,12 @@ public final class Heartbeat implements Filter {
         heart.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
-                if(url != null) {
+                if (url != null) {
                     HttpURLConnection beat = null;
                     try {
                         beat = (HttpURLConnection) url.openConnection();
+                        beat.getContent();
                     } catch (IOException e) {
-                        LOG.severe(e.getMessage());
                         e.printStackTrace(System.err);
                     } finally {
                         if (beat != null) {
