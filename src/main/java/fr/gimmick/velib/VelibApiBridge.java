@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 /** Bridge to Vélib' open data API */
-@WebServlet(name = "api", urlPatterns = "/api/*")
+@WebServlet(urlPatterns = "/api/*")
 public class VelibApiBridge extends HttpServlet {
 
     private static final String API_URL = "https://api.jcdecaux.com/vls/v1";

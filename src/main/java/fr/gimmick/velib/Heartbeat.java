@@ -7,7 +7,10 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebFilter;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -19,13 +22,15 @@ import java.util.logging.Logger;
 
 /** Heartbeat prevents the (cloud) server hibernation by simulating requests from the outside */
 @WebFilter("/*")
-public final class Heartbeat implements Filter {
+@WebServlet(urlPatterns = Heartbeat.URL)
+public final class Heartbeat extends HttpServlet implements Filter {
 
+    static final String URL = "/heartbeat";
     private static final Logger LOG = Logger.getLogger(Heartbeat.class.getName());
     private ScheduledExecutorService heart;
     private URL url;
 
-    private static URL rootUrl(HttpServletRequest req) throws MalformedURLException {
+    private static URL absoluteUrl(HttpServletRequest req) throws MalformedURLException {
 
         String rootUrl = req.getRequestURL().toString();
         int endIndex = rootUrl.length();
@@ -46,7 +51,7 @@ public final class Heartbeat implements Filter {
             rootUrl = rootUrl.substring(0, endIndex);
         }
 
-        return new URL(rootUrl);
+        return new URL(rootUrl + URL);
     }
 
     @Override
@@ -57,6 +62,7 @@ public final class Heartbeat implements Filter {
             public void run() {
                 if (url != null) {
                     HttpURLConnection beat = null;
+                    LOG.info("Heart?");
                     try {
                         beat = (HttpURLConnection) url.openConnection();
                         beat.getContent();
@@ -64,7 +70,6 @@ public final class Heartbeat implements Filter {
                         e.printStackTrace(System.err);
                     } finally {
                         if (beat != null) {
-                            LOG.info("Heartbeat: " + url.toString());
                             beat.disconnect();
                         }
                     }
@@ -76,9 +81,17 @@ public final class Heartbeat implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         if(url == null && request instanceof HttpServletRequest) {
-            url = rootUrl((HttpServletRequest) request);
+            url = absoluteUrl((HttpServletRequest) request);
         }
         chain.doFilter(request, response);
+    }
+
+    @Override
+    public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        LOG.info("Beat!");
+        resp.getWriter().append("Heart? Beat!");
+        resp.setStatus(HttpServletResponse.SC_OK);
+        resp.setContentType("text/plain");
     }
 
     @Override
