@@ -56,6 +56,8 @@ $(document).ready(function () {
         } else if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(function (position) {
                 $.getJSON(apiUrl, function (stations) {
+                    // Filter stations which are opened
+                    stations = _.filter(stations, {status: "OPEN"});
                     // Calculate the distance for each station
                     _.each(stations, function (station) {
                         station.distance = Math.sqrt(
