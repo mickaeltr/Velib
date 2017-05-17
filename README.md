@@ -1,7 +1,5 @@
 # Vélib'
 
-Try it out: http://velib.mickaeltr.cloudbees.net/
-
 ## Prerequisites
 
 - Maven 3
