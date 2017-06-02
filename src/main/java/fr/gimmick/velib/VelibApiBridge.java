@@ -30,7 +30,7 @@ public class VelibApiBridge extends HttpServlet {
         put("contract", "Paris");
     }};
 
-    public static void copy(InputStream inputStream, PrintWriter printWriter) throws IOException {
+    private static void copy(InputStream inputStream, PrintWriter printWriter) throws IOException {
         if (inputStream == null) {
             return;
         }
@@ -42,7 +42,7 @@ public class VelibApiBridge extends HttpServlet {
         }
     }
 
-    public static URL urlTo(String path) throws MalformedURLException, UnsupportedEncodingException {
+    private static URL urlTo(String path) throws MalformedURLException, UnsupportedEncodingException {
         StringBuilder url = new StringBuilder(API_URL);
         if (path != null) {
             url.append(path);

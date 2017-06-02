@@ -1,6 +1,6 @@
-$(document).ready(function () {
+$(document).ready(() => {
 
-    var apiUrl, station, templates, $view;
+    let apiUrl, station, templates, $view;
 
     initializeApplication();
     initializeStation();
@@ -12,7 +12,7 @@ $(document).ready(function () {
         apiUrl = "./api/stations";
 
         // French localization for date displays
-        moment.lang($("html").attr("lang"), {
+        moment.locale($("html").attr("lang"), {
             relativeTime: {
                 past: "il y a %s",
                 s: "quelques secondes",
@@ -29,14 +29,14 @@ $(document).ready(function () {
 
         // Read all templates from <script type="text/template" class="">
         templates = {};
-        _.each($("script[type='text/template']"), function (template) {
-            var $template = $(template);
+        _.each($("script[type='text/template']"), (template) => {
+            const $template = $(template);
             templates[$template.attr("class")] = _.template($template.html());
         });
 
         // Reinitialize station when URL hash changes
-        $(window).on("hashchange", function () {
-            if (!station || !window.location.hash || station.number != window.location.hash.slice(1)) {
+        $(window).on("hashchange", () => {
+            if (!station || !window.location.hash || station.number.toString() !== window.location.hash.slice(1)) {
                 initializeStation();
             }
         });
@@ -54,19 +54,19 @@ $(document).ready(function () {
             setStation({number: window.location.hash.slice(1)});
             updateStation();
         } else if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(function (position) {
-                $.getJSON(apiUrl, function (stations) {
+            navigator.geolocation.getCurrentPosition((position) => {
+                $.getJSON(apiUrl, (stations) => {
                     // Filter stations which are opened
                     stations = _.filter(stations, {status: "OPEN"});
                     // Calculate the distance for each station
-                    _.each(stations, function (station) {
+                    _.each(stations, (station) => {
                         station.distance = Math.sqrt(
                             Math.pow(station.position.lng - position.coords.longitude, 2)
                                 + Math.pow(station.position.lat - position.coords.latitude, 2)
                         );
                     });
                     // Find the nearest station
-                    setStation(_.find(stations, {distance: Math.min.apply(null, _.pluck(stations, "distance"))}));
+                    setStation(_.find(stations, {distance: Math.min.apply(null, _.map(stations, "distance"))}));
                     onStationUpdate();
                 });
             }, onError);
@@ -86,7 +86,7 @@ $(document).ready(function () {
                 // Strip the station number from the station name
                 station.name = station.name.replace(/[0-9]+ \- /, "");
                 // Capitalize (only) the first letter of each word
-                station.name = station.name.replace(/\w\S*/g, function (word) {
+                station.name = station.name.replace(/\w\S*/g, (word) => {
                     return word.charAt(0).toUpperCase() + word.substr(1).toLowerCase();
                 });
             }
@@ -96,7 +96,7 @@ $(document).ready(function () {
     /** Update station from API */
     function updateStation() {
         if (station) {
-            $.getJSON(apiUrl + "/" + station.number, function (data) {
+            $.getJSON(apiUrl + "/" + station.number, (data) => {
                 setStation(data);
                 onStationUpdate();
             });
