@@ -1,4 +1,4 @@
-# Vélib'
+# Vélib' [![Build Status](https://travis-ci.org/mickaeltr/Velib.svg?branch=master)](https://travis-ci.org/mickaeltr/Velib)
 
 ## Prerequisites
 
